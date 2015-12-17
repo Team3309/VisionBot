@@ -35,8 +35,5 @@ public class Robot extends IterativeRobot{
 		public void teleopPeriodic() {
 			// Update the subsystems
 			Drive.getInstance().update();
-			
-			System.out.println("GYRO: " + Sensors.getAngle());
-			System.out.println("GYRO RATE: " + Sensors.getAngularVel());
 		}
 }

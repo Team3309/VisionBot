@@ -2,9 +2,7 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.controllers.drive.DriveEncodersController;
-import org.team3309.lib.controllers.drive.equations.DriveAngularAndForwardVelocityEquationController;
 import org.team3309.lib.controllers.drive.equations.DriveBasicEquationController;
-import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
@@ -15,6 +13,8 @@ import edu.wpi.first.wpilibj.Victor;
 
 public class Drive extends ControlledSubsystem {
 
+	double MAX_ANG_VEL = 338, MAX_TRANS_VEL = 0;
+	double MAX_ANG_ACC = 100, MAX_TRANS_ACC = 0;
 	/**
 	 * Used to give a certain gap that the drive would be ok with being within
 	 * its goal encoder averageÃ�.
@@ -32,6 +32,8 @@ public class Drive extends ControlledSubsystem {
 	private Victor rightFront = new Victor(RobotMap.RIGHT_FRONT_MOTOR);
 	private Victor leftBack = new Victor(RobotMap.LEFT_BACK_MOTOR);
 	private Victor rightBack = new Victor(RobotMap.RIGHT_BACK_MOTOR);
+	private double pastAngVel = Sensors.getAngularVel();
+	private double pastTransVel = Sensors.getTransVel();
 
 	/**
 	 * Singleton Pattern
@@ -46,7 +48,7 @@ public class Drive extends ControlledSubsystem {
 
 	private Drive(String name) {
 		super(name);
-		//mController = new DriveCheezyDriveEquation();
+		// mController = new DriveCheezyDriveEquation();
 		mController = new DriveBasicEquationController();
 	}
 
@@ -64,6 +66,32 @@ public class Drive extends ControlledSubsystem {
 		updateController();
 		OutputSignal output = mController.getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
+		// Let me FIND MAX
+		if (Sensors.getAngularVel() > MAX_ANG_VEL) {
+			MAX_ANG_VEL = Sensors.getAngularVel();
+			Drive.instance.print("ANG MAX " + MAX_ANG_VEL);
+		}
+		if (Sensors.getTransVel() > this.MAX_TRANS_VEL) {
+			MAX_TRANS_VEL = Sensors.getTransVel();
+			Drive.instance.print("TRANS MAX " + MAX_TRANS_VEL);
+		}
+
+		if (Sensors.getAngularVel() - pastAngVel > MAX_ANG_ACC) {
+			MAX_ANG_ACC = Sensors.getAngularVel() - pastAngVel;
+			Drive.instance.print("ANG AC MAX " + MAX_ANG_ACC);
+		}
+		if (Sensors.getTransVel() - pastTransVel > this.MAX_TRANS_ACC) {
+			MAX_TRANS_ACC = Sensors.getTransVel() - pastTransVel;
+			Drive.instance.print("TRANS AC MAX " + MAX_TRANS_ACC);
+		}
+		// Drive.instance.print(" " + Sensors.getTrans());
+		pastAngVel = Sensors.getAngularVel();
+		pastTransVel = Sensors.getTransVel();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -193,9 +221,25 @@ public class Drive extends ControlledSubsystem {
 		leftBack.set(left);
 	}
 
+	public double getMAX_ANG_VEL() {
+		return MAX_ANG_VEL;
+	}
+
+	public double getMAX_TRANS_VEL() {
+		return MAX_TRANS_VEL;
+	}
+
 	@Override
 	public void sendToSmartDash() {
 		mController.sendToSmartDash();
+	}
+
+	public double getMAX_TRANS_ACC() {
+		return MAX_TRANS_ACC;
+	}
+
+	public double getMAX_ANG_ACC() {
+		return MAX_ANG_ACC;
 	}
 
 }

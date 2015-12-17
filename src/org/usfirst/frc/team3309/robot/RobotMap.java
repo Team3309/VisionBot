@@ -11,5 +11,7 @@ public class RobotMap {
 	public static final int ENCODERS_A_RIGHT_DRIVE_DIGITAL = 1;
 	public static final int ENCODERS_B_LEFT_DRIVE_DIGITAL = 2;
 	public static final int ENCODERS_B_RIGHT_DRIVE_DIGITAL = 3;
+	public static final int FOLLOWER_ENCODER_A = 4;
+	public static final int FOLLOWER_ENCODER_B = 5;
 	
 }
