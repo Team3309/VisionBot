@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.drive.DriveEncodersController;
 import org.team3309.lib.controllers.drive.equations.DriveBasicEquationController;
 import org.team3309.lib.controllers.generic.BlankController;
@@ -17,7 +18,7 @@ public class Drive extends ControlledSubsystem {
 	double MAX_ANG_ACC = 100, MAX_TRANS_ACC = 0;
 	/**
 	 * Used to give a certain gap that the drive would be ok with being within
-	 * its goal encoder averageÃ�.
+	 * its goal encoder average.
 	 */
 	private static final double DRIVE_ENCODER_LENIENCY = 40;
 
@@ -32,9 +33,13 @@ public class Drive extends ControlledSubsystem {
 	private Victor rightFront = new Victor(RobotMap.RIGHT_FRONT_MOTOR);
 	private Victor leftBack = new Victor(RobotMap.LEFT_BACK_MOTOR);
 	private Victor rightBack = new Victor(RobotMap.RIGHT_BACK_MOTOR);
+	
+	private double x = 0;
+	private double y = 0;
 	private double pastAngVel = Sensors.getAngularVel();
 	private double pastTransVel = Sensors.getTransVel();
-
+	private double pastTrans = 0;
+	
 	/**
 	 * Singleton Pattern
 	 * 
@@ -52,6 +57,11 @@ public class Drive extends ControlledSubsystem {
 		mController = new DriveBasicEquationController();
 	}
 
+	private void trackPosition() {
+		 this.x += KragerMath.cosDeg(Sensors.getAngle()) * (Sensors.getTrans() - pastTrans);
+		 this.y += KragerMath.sinDeg(Sensors.getAngle()) * (Sensors.getTrans() - pastTrans);
+		 
+	}
 	// Sets controller based on what state the remotes and game are in
 	private void updateController() {
 		// if mController is Completed and has not already been made blank, then
@@ -64,6 +74,7 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void update() {
 		updateController();
+		trackPosition();
 		OutputSignal output = mController.getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 		// Let me FIND MAX
@@ -87,6 +98,7 @@ public class Drive extends ControlledSubsystem {
 		// Drive.instance.print(" " + Sensors.getTrans());
 		pastAngVel = Sensors.getAngularVel();
 		pastTransVel = Sensors.getTransVel();
+		pastTrans = Sensors.getTrans();
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
@@ -103,6 +115,8 @@ public class Drive extends ControlledSubsystem {
 		input.setLeftVel(Sensors.leftDrive.getRate());
 		input.setRightVel(Sensors.rightDrive.getDistance());
 		input.setRightPos(Sensors.rightDrive.getRate());
+		input.setX(x);
+		input.setY(y);
 		return input;
 	}
 
@@ -241,5 +255,4 @@ public class Drive extends ControlledSubsystem {
 	public double getMAX_ANG_ACC() {
 		return MAX_ANG_ACC;
 	}
-
 }
