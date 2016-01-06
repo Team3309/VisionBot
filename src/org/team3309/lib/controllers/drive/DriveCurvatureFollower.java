@@ -1,5 +1,6 @@
 package org.team3309.lib.controllers.drive;
 
+import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -7,8 +8,8 @@ import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 
 public class DriveCurvatureFollower extends Controller {
 
-	private FeedForwardWithPIDController translationalController = new FeedForwardWithPIDController();
-	private FeedForwardWithPIDController angularController = new FeedForwardWithPIDController();
+	private FeedForwardWithPIDController translationalController = new FeedForwardWithPIDController(double kV, double kA, double kP, double kI, double kD, double kILimit);
+	private FeedForwardWithPIDController angularController = new FeedForwardWithPIDController(double kV, double kA, double kP, double kI, double kD, double kILimit);
 	private Pose[] path;
 	private int currentGoalIndex = 0;
 	
@@ -25,13 +26,17 @@ public class DriveCurvatureFollower extends Controller {
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
 		OutputSignal output = new OutputSignal();
-		double delta x
-		double deltax = path[currentGoalIndex].x - inputState.getX();
-		double deltay = path[currentGoalIndex].y - inputState.getY();
-		double lookaheadSquared = Math.pow((path[currentGoalIndex].x - inputState.getX()), 2) + Math.pow(path[currentGoalIndex].y - inputState.getY(), 2);
-		double curvature = (2*deltax)/(lookaheadSquared);
+		double a = path[currentGoalIndex].x - inputState.getX();
+		double b = path[currentGoalIndex].y - inputState.getY();
+		double l = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+		double theta = inputState.getAngularPos();
+		// otherSide = 90 - theta
+		double otherSide = 90 - theta;
+		double displacement = theta - otherSide;
+		double xRobotDelta = l * KragerMath.sinDeg(displacement);
+		double curvature = (2 * xRobotDelta)/(Math.pow(l, 2));
 		double aimTransVel;
-		if (deltay < 0) {
+		if (b < 0) { // default throttle aims 
 			aimTransVel = -10;
 		}else {
 			aimTransVel = 10;
@@ -48,11 +53,11 @@ public class DriveCurvatureFollower extends Controller {
 		return false;
 	}
 
-	public double[][] getPath() {
+	public Pose[] getPath() {
 		return path;
 	}
 
-	public void setPath(double path[][]) {
+	public void setPath(Pose[] path) {
 		this.path = path;
 	}
 
