@@ -8,8 +8,8 @@ import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 
 public class DriveCurvatureFollower extends Controller {
 
-	private FeedForwardWithPIDController translationalController = new FeedForwardWithPIDController(double kV, double kA, double kP, double kI, double kD, double kILimit);
-	private FeedForwardWithPIDController angularController = new FeedForwardWithPIDController(double kV, double kA, double kP, double kI, double kD, double kILimit);
+	//private FeedForwardWithPIDController translationalController = new FeedForwardWithPIDController(double kV, double kA, double kP, double kI, double kD, double kILimit);
+	//private FeedForwardWithPIDController angularController = new FeedForwardWithPIDController(double kV, double kA, double kP, double kI, double kD, double kILimit);
 	private Pose[] path;
 	private int currentGoalIndex = 0;
 	
@@ -42,9 +42,9 @@ public class DriveCurvatureFollower extends Controller {
 			aimTransVel = 10;
 		}
 		double aimAngVel = curvature * aimTransVel;
-		double rightSide = translationalController.getOutputSignal(inputState).getMotor() + angularController.getOutputSignal(inputState).getMotor();
-		double leftSide = translationalController.getOutputSignal(inputState).getMotor() - angularController.getOutputSignal(inputState).getMotor();
-		output.setLeftRightMotor(leftSide, rightSide);
+		//double rightSide = translationalController.getOutputSignal(inputState).getMotor() + angularController.getOutputSignal(inputState).getMotor();
+		//double leftSide = translationalController.getOutputSignal(inputState).getMotor() - angularController.getOutputSignal(inputState).getMotor();
+		//output.setLeftRightMotor(leftSide, rightSide);
 		return output;
 	}
 

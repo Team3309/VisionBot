@@ -8,9 +8,9 @@ import org.usfirst.frc.team3309.robot.Sensors;
 
 public class DriveEncodersController extends Controller {
 
-	private PIDPositionController leftController = new PIDPositionController(0, 0, 0);
-	private PIDPositionController rightController = new PIDPositionController(0, 0, 0);
-	private PIDPositionController angController = new PIDPositionController(0, 0, 0);
+	private PIDPositionController leftController = new PIDPositionController(.3, 0, 0);
+	private PIDPositionController rightController = new PIDPositionController(.2, 0, 0);
+	private PIDPositionController angController = new PIDPositionController(.2, 0, 0);
 	private double goalEncoder;
 	private double goalAngle;
 

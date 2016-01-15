@@ -77,7 +77,9 @@ public class Drive extends ControlledSubsystem {
 		trackPosition();
 		OutputSignal output = mController.getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
+		this.sendToSmartDash();
 		// Let me FIND MAX
+		/*
 		if (Sensors.getAngularVel() > MAX_ANG_VEL) {
 			MAX_ANG_VEL = Sensors.getAngularVel();
 			Drive.instance.print("ANG MAX " + MAX_ANG_VEL);
@@ -94,7 +96,7 @@ public class Drive extends ControlledSubsystem {
 		if (Sensors.getTransVel() - pastTransVel > this.MAX_TRANS_ACC) {
 			MAX_TRANS_ACC = Sensors.getTransVel() - pastTransVel;
 			Drive.instance.print("TRANS AC MAX " + MAX_TRANS_ACC);
-		}
+		}*/
 		// Drive.instance.print(" " + Sensors.getTrans());
 		pastAngVel = Sensors.getAngularVel();
 		pastTransVel = Sensors.getTransVel();
@@ -219,7 +221,7 @@ public class Drive extends ControlledSubsystem {
 	 * @param right
 	 *            rightMotorSpeed
 	 */
-	private void setRight(double right) {
+	public void setRight(double right) {
 		rightFront.set(-right);
 		rightBack.set(-right);
 	}
@@ -230,7 +232,7 @@ public class Drive extends ControlledSubsystem {
 	 * @param left
 	 *            leftMotorSpeed
 	 */
-	private void setLeft(double left) {
+	public void setLeft(double left) {
 		leftFront.set(left);
 		leftBack.set(left);
 	}
