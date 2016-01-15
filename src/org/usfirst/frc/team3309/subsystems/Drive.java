@@ -4,6 +4,7 @@ import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.drive.DriveEncodersController;
 import org.team3309.lib.controllers.drive.equations.DriveBasicEquationController;
+import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
@@ -53,8 +54,8 @@ public class Drive extends ControlledSubsystem {
 
 	private Drive(String name) {
 		super(name);
-		// mController = new DriveCheezyDriveEquation();
-		mController = new DriveBasicEquationController();
+		 mController = new DriveCheezyDriveEquation();
+		//mController = new DriveBasicEquationController();
 	}
 
 	private void trackPosition() {

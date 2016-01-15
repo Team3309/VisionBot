@@ -37,7 +37,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		// Update the subsystems
 		Drive.getInstance().update();
-		Drive.getInstance().setController(new DriveEncodersController(5000));
+		//Drive.getInstance().setController(new DriveEncodersController(5000));
 		/*if (Controls.driverController.getA()) {
 			Drive.getInstance().setLeft(.4);
 		} else if (Controls.driverController.getB()) {

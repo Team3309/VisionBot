@@ -5,6 +5,8 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class DriveCheezyDriveEquation extends Controller {
 
 	@Override
@@ -19,8 +21,9 @@ public class DriveCheezyDriveEquation extends Controller {
 	public OutputSignal getOutputSignal(InputState inputState) {
 		double throttle = Controls.driverController.getLeftY();
 		double wheel = Controls.driverController.getRightX();
-		boolean isHighGear = false;
 		boolean isQuickTurn = Controls.driverController.getRB();
+		boolean isHighGear = false;
+		OutputSignal signal = new OutputSignal();
 		double wheelNonLinearity;
 
 		wheel = handleDeadband(wheel, wheelDeadband);
@@ -34,7 +37,7 @@ public class DriveCheezyDriveEquation extends Controller {
 			// Apply a sin function that's scaled to make it feel better.
 			wheel = Math.sin(Math.PI / 2.0 * wheelNonLinearity * wheel) / Math.sin(Math.PI / 2.0 * wheelNonLinearity);
 			wheel = Math.sin(Math.PI / 2.0 * wheelNonLinearity * wheel) / Math.sin(Math.PI / 2.0 * wheelNonLinearity);
-		} else if (!isQuickTurn) {
+		} else {
 			wheelNonLinearity = 0.5;
 			// Apply a sin function that's scaled to make it feel better.
 			wheel = Math.sin(Math.PI / 2.0 * wheelNonLinearity * wheel) / Math.sin(Math.PI / 2.0 * wheelNonLinearity);
@@ -52,19 +55,19 @@ public class DriveCheezyDriveEquation extends Controller {
 		double negInertiaAccumulator = 0.0;
 		double negInertiaScalar;
 		if (isHighGear) {
-			negInertiaScalar = 4.0;
+			negInertiaScalar = 5.0;
 			sensitivity = .75;
 		} else {
 			if (wheel * negInertia > 0) {
-				negInertiaScalar = 0.0;
+				negInertiaScalar = 2.5;
 			} else {
 				if (Math.abs(wheel) > 0.65) {
-					negInertiaScalar = 0.0;
+					negInertiaScalar = 5.0;
 				} else {
-					negInertiaScalar = 0.0;
+					negInertiaScalar = 3.0;
 				}
 			}
-			sensitivity = .85; // Constants.sensitivityLow.getDouble();
+			sensitivity = .75;
 		}
 		double negInertiaPower = negInertia * negInertiaScalar;
 		negInertiaAccumulator += negInertiaPower;
@@ -87,20 +90,14 @@ public class DriveCheezyDriveEquation extends Controller {
 			}
 			overPower = 1.0;
 			if (isHighGear) {
-				sensitivity = .525;
+				sensitivity = 1.0;
 			} else {
-				sensitivity = .525;
+				sensitivity = 1.0;
 			}
-			angularPower = wheel * sensitivity;
-			rightPwm = leftPwm = linearPower;
-			leftPwm += angularPower;
-			rightPwm -= angularPower;
-		} else {
-			overPower = 0;
 			angularPower = wheel;
-			leftPwm = rightPwm = 0;
-			leftPwm += angularPower;
-			rightPwm -= angularPower;
+		} else {
+			overPower = 0.0;
+			angularPower = Math.abs(throttle) * wheel * sensitivity - quickStopAccumulator;
 			if (quickStopAccumulator > 1) {
 				quickStopAccumulator -= 1;
 			} else if (quickStopAccumulator < -1) {
@@ -109,6 +106,10 @@ public class DriveCheezyDriveEquation extends Controller {
 				quickStopAccumulator = 0.0;
 			}
 		}
+
+		rightPwm = leftPwm = linearPower;
+		leftPwm += angularPower;
+		rightPwm -= angularPower;
 
 		if (leftPwm > 1.0) {
 			rightPwm -= overPower * (leftPwm - 1.0);
@@ -123,9 +124,10 @@ public class DriveCheezyDriveEquation extends Controller {
 			leftPwm += overPower * (-1.0 - rightPwm);
 			rightPwm = -1.0;
 		}
-		OutputSignal signal = new OutputSignal();
 		signal.setLeftMotor(leftPwm);
 		signal.setRightMotor(rightPwm);
+		SmartDashboard.putNumber("left", leftPwm);
+		SmartDashboard.putNumber("right", rightPwm);
 		return signal;
 	}
 
